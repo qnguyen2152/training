@@ -1,1 +1,2 @@
-Hôm nay là 1 ngày đẹp trời
+﻿Tôi đang học Git
+
