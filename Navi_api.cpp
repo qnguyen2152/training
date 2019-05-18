@@ -1066,4 +1066,78 @@ bool Navi_boGetBarGraphVisible(void) /* @status Prototype */
     }
     return (boDistTPVisible);
 }
+RSST_nInvalidBitmapID Driving_Assist_enGetAdvTBTSChematicBmpID (uint8 u8Region, uint8 u8CardIndex)
+{
+    **************************
+    * Get the Bitmap id for Schematic Diagram
+    @response => ONCHANGE
+    @return   => RSST_tenBitmapID
+    @param u8Region - Area Information for schematics.
+    *****************************************************/
+
+    TPITBTAdvanced_tstDpoolData stAdvTbt;
+    RSST__tenBitmapID enRSST = RSST_nInvalidBitmapID;
+    uint8 u8DisplayTYpe = 0;
+    
+    APIM_boGetData(APIm_nDid_TPITBTAdvanced_tstDpoolData, &stAdvTbt, (uint16)sizeof(stAdvTbt));
+    
+    if(u8CardIndex > stAdvTbt.u8TurnListCnt || u8CardIndex < 1)
+    {
+        return enRSSTID;
+    }
+
+    u8DisplayType = stAdvTbt.u8DisplayType[u8CardIndex -1];
+
+    if(u8DisplayType >= 0x41 && u8DisplayType<=0xCB)
+        {
+            uint8 u8Idx = 0;
+            for (u8Idx = 0; u8Idx < sizeof(NAVI::astSchematicsID) / sizeof(NAVI::tstSchematicsBmpID); u8Idx++)
+            {
+                if (u8DisplayType == NAVI::astSchematicsID[u8Idx].u8DisplayType)
+                {
+                    switch(u8Region)
+                    {
+                    case 0:
+                        enRSSTID = NAVI::astSchematicsID[u8Idx].enDomRSSTID;
+                        break;
+                    case 1:
+                        enRSSTID = NAVI::astSchematicsID[u8Idx].enOtherRSSTID;
+                        break;
+                    case 2:
+                        enRSSTID = NAVI::astSchematicsID[u8Idx].enChnRSSTID;
+                        break;
+                    default:
+                        break;
+                    }
+                    break;
+                }
+            }
+        }
+        else if ((u8DisplayType == 0x0D) || (u8DisplayType == 0x1F) || (u8DisplayType >= 0x11 && u8DisplayType <= 0x14) || (u8DisplayType >= 0x17 && u8DisplayType <= 0x21) || (u8DisplayType >= 0x17 && u8DisplayType <= 0x21) || (u8DisplayType >= 0x2B && u8DisplayType <= 0x2E))
+        {
+            uint8 u8Idx = 0;
+            for (u8Idx = 0; u8Idx < sizeof(NAVI::astPreInfoExceptTBTBmpID) / sizeof(NAVI::tstPreInfoExceptTBTBmpID); u8Idx++)
+            {
+                if (u8DisplayType == NAVI::astPreInfoExceptTBTBmpID[u8Idx].u8DisplayType && u8Direction == NAVI::astPreInfoExceptTBTBmpID[u8Idx].u8TBT_Direction)
+                {
+                    switch (u8Region)
+                    {
+                    case 0:
+                        enRSSTID = NAVI::astPreInfoExceptTBTBmpID[u8Idx].enDomRSSTID;
+                        break;
+                    case 1:
+                        enRSSTID = NAVI::astPreInfoExceptTBTBmpID[u8Idx].enOtherRSSTID;
+                        break;
+                    case 2:
+                        enRSSTID = NAVI::astPreInfoExceptTBTBmpID[u8Idx].enChnRSSTID;
+                        break;
+                    default:
+                        break;
+                    }
+                    break;
+                }
+            }
+        }
+    return (enRSSTID);
+}
 /* --- EOF --- */
